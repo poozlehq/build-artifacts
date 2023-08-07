@@ -13248,7 +13248,7 @@ async function Mc(e, n) {
           "https://api.atlassian.com/oauth/token/accessible-resources",
           { headers: { Authorization: n.Authorization } }
         )
-      ).data.find((n) => n.url === `https://${e.jira_domain}`).id
+      ).data.find((n) => n.url === `https://${e.confluence_domain}`).id
     }/wiki/api/v2`;
   }
   return `https://${e.confluence_domain}/wiki/api/v2`;
@@ -13615,7 +13615,11 @@ class np extends Li {
       if ("OAuth2" === e.authType) {
         const n = (await this.spec()).auth_specification.OAuth2,
           a = await Fi(Ti(n.token_url, e), e);
-        return { Authorization: `Bearer ${a}` };
+        return {
+          Authorization: `Bearer ${a.access_token}`,
+          "refresh-token": a.refresh_token,
+          expiry: a.expires_in,
+        };
       }
       return {
         Authorization: `Basic ${Buffer.from(
