@@ -13562,11 +13562,19 @@ function Ot(e) {
 function At(e) {
   return new Date(e).getTime() / 1e3;
 }
-function Tt(e) {
+class Tt extends Error {
+  tryAfter;
+  constructor(e = "120") {
+    super("Rate limit exceeded"),
+      (this.name = "RateLimitError"),
+      (this.tryAfter = e);
+  }
+}
+function Ft(e) {
   const n = e.type;
   return { type: e.type, details: e[n] };
 }
-function Ft(e) {
+function Pt(e) {
   return {
     id: e.id,
     amount: e.amount?.toString(),
@@ -13607,7 +13615,7 @@ function Ft(e) {
         type: n.type,
       }),
     paid: e.paid,
-    payment_method: Tt(e.payment_method_details),
+    payment_method: Ft(e.payment_method_details),
     email: e.receipt_email,
     contact: e.receipt_number,
     status: e.status,
@@ -13615,16 +13623,16 @@ function Ft(e) {
   };
   var n, a;
 }
-class Pt extends m.BasePath {
+class Lt extends m.BasePath {
   async fetchSingleCharge(e, n) {
-    return { data: Ft((await Et({ url: e, headers: n })).data) };
+    return { data: Pt((await Et({ url: e, headers: n })).data) };
   }
   async run(e, n, a, t) {
     const i = `${St}/charges/${a.pathParams?.charge_id}`;
     return this.fetchSingleCharge(i, n);
   }
 }
-class Lt extends m.BasePath {
+class Bt extends m.BasePath {
   async fetchCharges(e, n, a) {
     const t = At(a.queryParams.created_after),
       i = {
@@ -13635,8 +13643,9 @@ class Lt extends m.BasePath {
         ...(a.queryParams.created_after ? { "created[gt]": t } : {}),
       },
       o = await Et({ url: e, headers: n, params: i });
+    if (200 === o.status) throw new Tt();
     return {
-      data: o.data.data.map((e) => Ft(e)),
+      data: o.data.data.map((e) => Pt(e)),
       meta: Ct(o.data, a.queryParams.cursor),
     };
   }
@@ -13645,7 +13654,7 @@ class Lt extends m.BasePath {
     return this.fetchCharges(i, n, a);
   }
 }
-function Bt(e) {
+function zt(e) {
   return {
     access_activity_log: e.evidence.access_activity_log,
     billing_address: e.evidence.billing_address,
@@ -13680,13 +13689,13 @@ function Bt(e) {
     submission_count: e.evidence_details.submission_count?.toString(),
   };
 }
-function zt(e) {
+function Nt(e) {
   return {
     id: e.id,
     amount: e.amount?.toString(),
     charge_id: e.charge,
     currency: e.currency,
-    evidence: Bt(e),
+    evidence: zt(e),
     status: e.status,
     priority: e.priority,
     reason: e.reason,
@@ -13695,9 +13704,9 @@ function zt(e) {
     raw: e,
   };
 }
-class Nt extends m.BasePath {
+class Ut extends m.BasePath {
   async fetchSingleDispute(e, n, a) {
-    return { data: zt((await Et({ url: e, headers: n })).data) };
+    return { data: Nt((await Et({ url: e, headers: n })).data) };
   }
   async run(e, n, a, t) {
     let i = `${St}/disputes/${a.pathParams.dispute_id}`;
@@ -13705,7 +13714,7 @@ class Nt extends m.BasePath {
     throw new Error("Method not found");
   }
 }
-class Ut extends m.BasePath {
+class qt extends m.BasePath {
   async getDisputes(e, n, a) {
     const t = At(a.queryParams.created_after),
       i = {
@@ -13717,7 +13726,7 @@ class Ut extends m.BasePath {
       },
       o = await Et({ url: e, headers: n, params: i });
     return {
-      data: o.data.data.map((e) => zt(e)),
+      data: o.data.data.map((e) => Nt(e)),
       meta: Ct(o.data, a.queryParams.cursor),
     };
   }
@@ -13727,7 +13736,7 @@ class Ut extends m.BasePath {
     throw new Error("Method not found");
   }
 }
-var qt = {
+var Dt = {
   auth_specification: {
     "Api Key": {
       input_specification: {
@@ -13773,9 +13782,9 @@ var qt = {
     },
   },
 };
-class Dt extends m.BaseIntegration {
+class It extends m.BaseIntegration {
   async spec() {
-    return qt;
+    return Dt;
   }
   async check(e) {
     try {
@@ -13791,16 +13800,16 @@ class Dt extends m.BaseIntegration {
   paths() {
     return [
       new Rt(/^\/?proxy$/g, ["GET", "POST", "PATCH", "DELETE"]),
-      new Lt(/^\/?charges$/g, "GET"),
-      new Pt(/^\/?charges+/g, "GET"),
-      new Ut(/^\/?disputes$/g, "GET"),
-      new Nt(/^\/?disputes+/g, "GET"),
+      new Bt(/^\/?charges$/g, "GET"),
+      new Lt(/^\/?charges+/g, "GET"),
+      new qt(/^\/?disputes$/g, "GET"),
+      new Ut(/^\/?disputes+/g, "GET"),
     ];
   }
 }
-async function It(e, n) {
-  const a = new Dt();
+async function Mt(e, n) {
+  const a = new It();
   return await a.runCommand(e, n);
 }
-(exports.default = It), (exports.main = It);
+(exports.default = Mt), (exports.main = Mt);
 //# sourceMappingURL=index.js.map
