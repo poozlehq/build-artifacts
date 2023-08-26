@@ -13331,21 +13331,22 @@ function Qc(e) {
     amount_refunded: e.amount_refunded?.toString(),
     application: e.application,
     application_fee_amount: e.application_fee_amount?.toString(),
-    billing_details:
-      ((a = e.billing_details),
-      {
-        address: {
-          city: a.address.city,
-          country: a.address.country,
-          line1: a.address.line1,
-          line2: a.address.line2,
-          postal_code: a.address.postal_code,
-          state: a.address.state,
-        },
-        email: a.email,
-        name: a.name,
-        phone: a.phone,
-      }),
+    billing_details: e.billing_details
+      ? ((a = e.billing_details),
+        {
+          address: {
+            city: a.address.city,
+            country: a.address.country,
+            line1: a.address.line1,
+            line2: a.address.line2,
+            postal_code: a.address.postal_code,
+            state: a.address.state,
+          },
+          email: a.email,
+          name: a.name,
+          phone: a.phone,
+        })
+      : {},
     captured: e.captured,
     created_at: Gc(e.created),
     currency: e.currency,
@@ -13355,17 +13356,20 @@ function Qc(e) {
     failure_message: e.failure_message,
     invoice: e.invoice,
     metadata: e.metadata,
-    outcome:
-      ((n = e.outcome),
-      {
-        network_status: n.network_status,
-        reason: n.reason,
-        risk_level: n.risk_level,
-        seller_message: n.seller_message,
-        type: n.type,
-      }),
+    outcome: e.outcome
+      ? ((n = e.outcome),
+        {
+          network_status: n.network_status,
+          reason: n.reason,
+          risk_level: n.risk_level,
+          seller_message: n.seller_message,
+          type: n.type,
+        })
+      : {},
     paid: e.paid,
-    payment_method: Kc(e.payment_method_details),
+    payment_method: e.payment_method_details
+      ? Kc(e.payment_method_details)
+      : {},
     email: e.receipt_email,
     contact: e.billing_details.phone ?? null,
     status: e.status,
